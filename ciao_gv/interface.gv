@@ -1,0 +1,17 @@
+digraph INTERFACE {
+    start [label=INTERFACE shape=plaintext]
+    A [label=name shape=diamond]
+    B [label="(" shape=oval]
+    C [label=DECLARATION shape=box]
+    D [label="," shape=oval]
+    E [label=")" shape=oval]
+    end [label="" shape=point]
+    start -> A
+    A -> B
+    B -> C
+    C -> D
+    D -> C
+    C -> E
+    E -> end
+    A -> end
+}

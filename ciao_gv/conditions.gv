@@ -1,0 +1,10 @@
+digraph CONDITIONS {
+    start [label=CONDITIONS shape=plaintext]
+    A [label="conditions" shape=oval]
+    B [label=INTERFACE shape=box]
+    end [label="" shape=point]
+    start -> A
+    A -> B
+    B -> B
+    B -> end
+}

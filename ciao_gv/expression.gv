@@ -1,0 +1,27 @@
+digraph EXPRESSION {
+    start [label=EXPRESSION shape=plaintext]
+    A [label=number shape=diamond]
+    B [label=name shape=diamond]
+    C [label="!" shape=oval]
+    D [label=EXPRESSION shape=box]
+    E [label="(" shape=oval]
+    F [label=EXPRESSION shape=box]
+    G [label=")" shape=oval]
+    H [label=BOOLEXPR shape=box]
+    end [label="" shape=point]
+    start -> A
+    start -> B
+    start -> C
+    start -> E
+    start -> H
+
+    C -> D
+    E -> F
+    F -> G
+
+    A -> end
+    B -> end
+    D -> end
+    G -> end
+    H -> end
+}

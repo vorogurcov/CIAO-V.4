@@ -1,0 +1,10 @@
+digraph ASSERTIONS {
+    start [label=ASSERTIONS shape=plaintext]
+    A [label="assertions" shape=oval]
+    B [label=ASSERT shape=box]
+    end [label="" shape=point]
+    start -> A
+    A -> B
+    B -> B
+    B -> end
+}

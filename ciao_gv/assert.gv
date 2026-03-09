@@ -1,0 +1,11 @@
+digraph ASSERT {
+    start [label=ASSERT shape=plaintext]
+    A [label=name shape=diamond]
+    B [label="<-" shape=oval]
+    C [label=BOOLEXPR shape=box]
+    end [label="" shape=point]
+    start -> A
+    A -> B
+    B -> C
+    C ->  end
+}

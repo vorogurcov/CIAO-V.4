@@ -1,0 +1,113 @@
+ciao Semantics
+    class Automaton
+        events
+            create
+            destroy
+            transition(trName: String)
+            reset
+        effects
+            onCreate
+            onDestroy
+            onTransition(trName: String)
+            onReset
+        conditions
+            hasTransition
+            isActive
+        assertions
+            isInitial <- state=Initial
+            isCreated <- state=Created
+        variables
+            statesList : List<String>
+            transitions : List<String>
+            currentState : String
+        states
+            Initial -> create / onCreate -> Created
+            Created -> destroy / onDestroy -> Destroyed
+            Created -> transition(trName) [hasTransition] / onTransition(trName) -> Transitioned
+                [else] / onTransition(trName) -> Created
+            Transitioned -> transition(trName) [hasTransition] / onTransition(trName) -> Transitioned
+                [else] / onTransition(trName) -> Created
+            Destroyed -> reset / onReset -> Initial
+
+    class State
+        events
+            enter(stateName: String)
+            exit(stateName: String)
+            toggle(newName: String)
+        effects
+            onEnter(stateName: String)
+            onExit(stateName: String)
+            onToggle(newName: String)
+        conditions
+            isValidName(name: String) : Boolean
+        assertions
+            isActive <- state = Active
+        variables
+            name : String
+            transitions : List<String>
+        states
+            Inactive -> enter(name) [isValidName(name)] / onEnter(name) -> Active
+                [else] / onEnter(name) -> Inactive
+            Active -> exit(name) / onExit(name) -> Inactive
+            Active -> toggle(newName) [isValidName(newName)] / onToggle(newName) -> Inactive
+            Inactive -> toggle(newName) [isValidName(newName)] / onToggle(newName) -> Active
+
+    class Transition
+        events
+            trigger(trName: String)
+            reset
+        effects
+            onTrigger(trName: String)
+            onReset
+        conditions
+            isValidTransition
+        assertions
+            isActive <- state=Active
+        variables
+            source : String
+            target : String
+            guard : String
+            effect : String
+        states
+            Inactive -> trigger(trName) [isValidTransition(trName)] / onTrigger(trName) -> Active
+                [else] / onTrigger(trName) -> Inactive
+            Active -> reset() / onReset() -> Inactive
+
+    class Interface
+        events
+            call(params: List<String>)
+            loop
+        effects
+            onCall(params: List<String>)
+            onLoop
+        variables
+            name : String
+            vars : Map<String, String>
+        states
+            Idle -> call(params) / onCall(params) -> Called
+            Called -> loop / onLoop -> Looping
+            Looping -> call(params) / onCall(params) -> Called
+
+    scheme
+        objects
+            automaton = new Automaton (Initial)
+            mainState = new State (Inactive)
+            mainTransition = new Transition (Inactive)
+            mainInterface = new Interface (Idle)
+        links
+            automaton.onTransition(trName) <- mainTransition.trigger(trName)
+            automaton.onReset <- mainTransition.reset
+            mainState.onEnter(stateName) <- automaton.onCreate
+            mainState.onExit(stateName) <- automaton.onDestroy
+            mainInterface.onCall(params) <- mainTransition.onTrigger(params)
+        public
+            automaton.create
+            automaton.destroy
+            automaton.transition(trName)
+            automaton.reset
+            mainState.toggle(newName)
+            mainInterface.call(params)
+        private
+            mainTransition.reset
+            mainState.enter(stateName)
+.

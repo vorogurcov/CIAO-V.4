@@ -1,0 +1,27 @@
+digraph INTERFACES {
+    start [label=INTERFACES shape=plaintext]
+    A [label="public" shape=oval]
+    B [label=name shape=diamond]
+    C [label="." shape=oval]
+    D [label=INTERFACE shape=box]
+    E [label="private" shape=oval]
+    F [label=name shape=diamond]
+    G [label="." shape=oval]
+    H [label=INTERFACE shape=box]
+    end [label="" shape=point]
+    start -> end
+    start -> A
+    start -> E
+    A -> B
+    B -> C
+    C -> D
+    D -> E
+    D -> end
+    D -> B
+    E -> F
+    F -> G
+    G -> H
+    H -> end
+    H -> F
+    E -> end
+}

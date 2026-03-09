@@ -1,0 +1,7 @@
+digraph INITIAL {
+    start [label=INITIAL shape=plaintext]
+    A [label=name shape=diamond]
+    end [label="" shape=point]
+    start -> A
+    A -> end
+}

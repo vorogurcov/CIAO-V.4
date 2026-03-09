@@ -1,0 +1,41 @@
+ciao Sample1
+	class Producer
+		events
+			order (s : Specs)
+			done (g : Goods)
+		effects
+			produce (s : Specs)
+			deliver (g : Goods)
+		variables
+			s : Specs
+			g : Goods
+		states
+			ready -> order(s) / produce(s) -> busy
+			busy -> done(g) / deliver(g) -> ready
+	class Consumer
+		events
+			need (s : Specs)
+			deliver (g : Goods)
+		effects
+			order (s : Specs)
+			consume (g : Goods)
+		variables
+			s : Specs
+			g : Goods
+		states
+			normal -> need(s) / order(s) -> waiting
+			waiting -> deliver(g) / consume(g) -> normal
+    scheme
+		objects
+			p = new Producer (ready)
+			q = new Consumer (normal)
+		links
+			q <- p.order(s : Specs)
+			p <- q.deliver(g : Goods)
+		public
+			q.need(s : Specs)
+		private
+			q.consume(g : Goods)
+			p.done(g : Goods)
+			p.produce(s : Specs)
+.

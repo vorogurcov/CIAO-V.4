@@ -1,0 +1,14 @@
+digraph DIRECT {
+    start [label=DIRECT shape=plaintext]
+    A [label="/" shape=oval]
+    B [label=ACTIONS shape=box]
+    C [label="->" shape=oval]
+    D [label=name shape=diamond]
+    end [label="" shape=point]
+    start -> A
+    start -> C
+    A -> B
+    B -> C
+    C -> D
+    D -> end
+}

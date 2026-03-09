@@ -1,0 +1,35 @@
+ciao TrafficLightController
+    class TrafficLight
+        events
+            switch
+            stop
+        variables
+            t1: Integer
+            t2: Integer
+        states
+            Idle -> switch / t1:=10; t2:=10-> Red
+            Red -> after (t1) -> Green
+            Red -> stop -> Idle
+            Green -> after (t2)-> Red
+            Green -> stop -> Idle
+    class Controller
+        events
+            run
+            stop
+        effects
+            start_traffic_light
+            stop_traffic_light
+        states
+            Idle -> run / start_traffic_light -> ID2
+            ID2 -> stop / stop_traffic_light -> Idle
+    scheme
+        objects
+            traffic_light = new TrafficLight (Idle)
+            controller = new Controller (Idle)
+        links
+            controller.start_traffic_light <- traffic_light.switch
+            controller.stop_traffic_light <- traffic_light.stop
+        public
+            controller.run
+            controller.stop
+.

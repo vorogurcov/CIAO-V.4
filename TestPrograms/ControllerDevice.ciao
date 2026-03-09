@@ -1,0 +1,58 @@
+ciao Elevator
+    class Controller
+        events
+            in
+            out
+            enter
+            exit
+        effects
+            open_door
+            close_door
+            switch_on
+            switch_off
+            occupy
+            free
+        conditions
+            occupied
+        variables
+            t1: Integer
+            t2: Integer
+        states
+            Idle -> in [occupied] -> Idle [else] / t1 := 10; t2 := 20; switch_on; open_door -> I2B
+            I2B -> after (t1) / close_door; switch_off -> Idle
+            I2B -> enter / close_door; occupy -> Busy
+            Busy -> out / open_door -> B2I
+            B2I -> after (t2) / close_door -> Busy
+            B2I -> exit / close_door; switch_off; free -> Idle
+
+    class Device
+        events
+            off
+            on
+        assertions
+            isOn <- state=On
+        states
+            Off -> on -> On
+            Off -> off -> Off
+            On -> on -> On
+            On -> off -> Off
+   scheme
+        objects
+            controller = new Controller (Idle)
+            door = new Device (Off)
+            light = new Device (Off)
+            cabin = new Device (Off)
+        links
+            controller.open_door <- door.on
+            controller.close_door <- door.off
+            controller.switch_on <- light.on
+            controller.switch_off <- light.off
+            controller.occupy <- cabin.on
+            controller.free <- cabin.off
+            controller.occupied <- cabin.isOn
+        public
+            controller.in
+            controller.out
+            controller.enter
+            controller.exit
+.

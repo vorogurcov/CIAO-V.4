@@ -1,0 +1,13 @@
+{
+    "syntax": {
+        "type": "virt",
+        "info": {
+            "supportInfo": "dsl_info_ciao",
+            "diagrams": "ciao_gv"
+        }
+    },
+    "semantics": {
+        "type": "ciao"
+    },
+    "debugInfoDir": "_debug"
+}

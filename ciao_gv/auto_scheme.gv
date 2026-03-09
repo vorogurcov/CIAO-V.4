@@ -1,0 +1,14 @@
+digraph AUTO_SCHEME {
+    start [label=AUTO_SCHEME shape=plaintext]
+    A [label="scheme" shape=oval]
+    B [label=OBJECTS shape=box]
+    C [label=LINKS shape=box]
+    D [label=INTERFACES shape=box]
+    end [label="" shape=point]
+    start -> A
+    A -> B
+    B -> C
+    B->D
+    C -> D
+    D -> end
+}

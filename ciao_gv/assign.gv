@@ -1,0 +1,11 @@
+digraph ASSIGN{
+    start [label=ASSIGN shape=plaintext]
+    A [label=name shape=diamond]
+    B [label=":=" shape=oval]
+    C [label=EXPRESSION shape=box]
+    end [label="" shape=point]
+    start -> A
+    A -> B
+    B -> C
+    C -> end
+}

@@ -1,0 +1,10 @@
+digraph EVENTS {
+    start [label=EVENTS shape=plaintext]
+    A [label="events" shape=oval]
+    B [label=INTERFACE shape=box]
+    end [label="" shape=point]
+    start -> A
+    A -> B
+    B -> B
+    B -> end
+}

@@ -1,0 +1,66 @@
+ciao Clapans
+    class A0
+      events
+        x_i
+        x_j
+        y2_1
+        y2_2
+        y2_3
+        y2_4
+      effects
+        open_1
+        close_1
+        open_2
+        close_2
+      states
+        Idle -> x_i / open_1; open_2 -> WaitOpenAll
+        Idle -> x_j / close_1; close_2 -> WaitCloseAll
+        WaitOpenAll -> y2_2 -> WaitOpenSecond
+        WaitOpenAll -> y2_4 -> WaitOpenFirst
+        WaitOpenFirst -> y2_2 -> Idle
+        WaitOpenSecond -> y2_4 -> Idle
+        WaitCloseAll -> y2_1 -> WaitCloseSecond
+        WaitCloseAll -> y2_3 -> WaitCloseFirst
+        WaitCloseFirst -> y2_1 -> Idle
+        WaitCloseSecond -> y2_3 -> Idle
+
+    class A1
+      events
+        open_1
+        close_1
+      effects
+        valveOpened_1
+        valveClosed_1
+      states
+        Closed -> open_1 / valveOpened_1 -> Opened
+        Opened -> close_1 / valveClosed_1 -> Closed
+
+    class A2
+      events
+        open_2
+        close_2
+      effects
+        valveOpened_2
+        valveClosed_2
+      states
+        Closed -> open_2 / valveOpened_2 -> Opened
+        Opened -> close_2 / valveClosed_2 -> Closed
+
+    scheme
+      objects
+        a0 = new A0(Idle)
+        a1 = new A1(Closed)
+        a2 = new A2(Closed)
+      links
+        a0.open_1  <- a1.open_1
+        a0.close_1 <- a1.close_1
+        a0.open_2  <- a2.open_2
+        a0.close_2 <- a2.close_2
+        a1.valveOpened_1  <- a0.y2_2
+        a1.valveClosed_1  <- a0.y2_1
+        a2.valveOpened_2  <- a0.y2_4
+        a2.valveClosed_2  <- a0.y2_3
+      public
+        a0.x_i
+        a0.x_j
+.

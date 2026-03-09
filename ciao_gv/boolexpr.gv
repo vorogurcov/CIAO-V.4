@@ -1,0 +1,30 @@
+digraph BOOLEXPR {
+    start [label=BOOLEXPR shape=plaintext]
+    H [label=EXPRESSION shape=box]
+    I [label="+" shape=oval]
+    J [label="-" shape=oval]
+    K [label="*" shape=oval]
+    L [label="/" shape=oval]
+    M [label="&" shape=oval]
+    N [label="|" shape=oval]
+    O [label="=" shape=oval]
+    P [label=EXPRESSION shape=box]
+    end [label="" shape=point]
+    start -> H
+    H -> I
+    H -> J
+    H -> K
+    H -> L
+    H -> M
+    H -> N
+    H -> O
+    I -> P
+    J -> P
+    K -> P
+    L -> P
+    M -> P
+    N -> P
+    O -> P
+    P -> end
+    H->end
+}

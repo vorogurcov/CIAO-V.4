@@ -1,0 +1,10 @@
+digraph VARIABLES {
+    start [label=VARIABLES shape=plaintext]
+    A [label="variables" shape=oval]
+    B [label=DECLARATION shape=box]
+    end [label="" shape=point]
+    start -> A
+    A -> B
+    B -> B
+    B -> end
+}

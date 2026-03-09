@@ -1,0 +1,64 @@
+ciao Sample3
+	class Passenger
+		events
+			want(y : Integer)
+			opened
+		effects	
+			call(x : Integer)
+			goTo(y : Integer)
+			empty
+		conditions
+			inside
+		variables
+			x : Integer
+			y : Integer
+		states
+			begin -> want(y) / call(x) -> WaitOut
+			WaitOut -> opened [inside] / goTo(y) -> WaitIn 
+				[else] / empty -> end
+			WaitIn -> opened [inside] / goTo(y) -> WaitIn
+				[else] / empty -> end
+			Wait -> want(y) -> Wait
+	class Elevator
+		events
+			call(x : Integer)
+			goTo(y : Integer)
+			empty
+		effects
+			opened
+			move(y : Integer)
+			lightOn
+			lightOff
+			open
+			close
+		conditions
+			isFloor(y : Integer)
+		variables
+			x : Integer
+			y : Integer
+		states
+			Idle -> call(x) [isFloor(x)] / lightOn; open; opened -> Service
+				[else] / move(x); lightOn; open; opened -> Service
+			Service -> empty / close; lightOff -> end
+			Service -> goTo(y) [isFloor(y)] / opened -> Service
+				[else] / close; move(y); open; opened -> Service
+	scheme
+		objects
+			p = new Passenger(begin)
+			e = new Elevator(Idle)
+		links 
+			p <- e.call(x : Integer)
+			p <- e.goTo(y : Integer)
+			p <- e.empty
+			e <- p.opened
+		public
+			p.want(y : Integer)
+		private 
+			p.inside
+			e.move(y : Integer)
+			e.lightOn
+			e.lightOff
+			e.open
+			e.close
+			e.isFloor(y : Integer)
+.

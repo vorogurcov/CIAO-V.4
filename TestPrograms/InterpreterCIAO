@@ -1,0 +1,29 @@
+ciao InterpreterCIAO
+	class Interpreter
+		events
+		    set(a:String, e:String, p:String)
+		    tick(a:String, e:String, p:String)
+		    exit
+		    restart
+		effects
+		    trigger_stop
+		conditions
+		    isEnd
+		variables
+		    a:String
+		    e:String
+		    p:String
+		states
+		    start -> set(a,e,p)/tick(a,e,p) -> ready
+		    ready -> tick(a,e,p) [!isEnd]/tick(a,e,p) -> ready
+		            [else] / trigger_stop -> stop
+		    stop -> restart -> start
+    scheme
+        objects
+            interpreter = new Interpreter(start)
+        links
+            interpreter.tick(a:String, e:String, p:String) <- interpreter.tick(a:String, e:String, p:String)
+            interpreter.trigger_stop <- interpreter.restart
+        public
+            interpreter.set(a:String, e:String, p:String)
+.

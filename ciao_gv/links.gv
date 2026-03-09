@@ -1,0 +1,10 @@
+digraph LINKS {
+    start [label=LINKS shape=plaintext]
+    A [label="links" shape=oval]
+    B [label=LINK shape=box]
+    end [label="" shape=point]
+    start -> A
+    A -> B
+    B -> B
+    B -> end
+}

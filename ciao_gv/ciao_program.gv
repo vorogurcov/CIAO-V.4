@@ -1,0 +1,16 @@
+digraph CIAO_PROGRAM {
+    start [label=CIAO_PROGRAM shape=plaintext]
+    A [label="ciao" shape=oval]
+    B [label=name shape=diamond]
+    C [label=AUTO_CLASS shape=box]
+    D [label=AUTO_SCHEME shape=box]
+    E [label="." shape=oval]
+    end [label="" shape=point]
+    start -> A
+    A -> B
+    B -> C
+    C -> C
+    C -> D
+    D -> E
+    E -> end
+}

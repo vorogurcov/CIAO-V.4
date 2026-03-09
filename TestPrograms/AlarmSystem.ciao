@@ -1,0 +1,85 @@
+ciao AlarmSystem
+  class A
+    events
+      pressH
+      pressM
+      pressA
+      minuteTimer
+      timeBelow
+      timeMatch
+    effects
+      incCurrentHours
+      incCurrentMins
+      incAlarmHours
+      incAlarmMins
+      incTime
+      activateAlarm
+      deactivateAlarm
+    states
+      Idle -> pressH / incCurrentHours -> Setting
+      Idle -> pressM / incCurrentMins -> Setting
+      Idle -> pressA / incAlarmHours; incAlarmMins -> AlarmWait
+      Idle -> minuteTimer / incTime -> Idle
+      Setting -> timeBelow / incCurrentHours; incCurrentMins -> Setting
+      Setting -> minuteTimer / incTime -> Setting
+      Setting -> pressA / incAlarmHours; incAlarmMins -> AlarmWait
+      AlarmWait -> timeMatch / activateAlarm -> AlarmWait
+      AlarmWait -> timeBelow / incTime -> AlarmWait
+      AlarmWait -> pressH / deactivateAlarm -> Idle
+
+  class Clock
+    events
+      increaseCurrentHours
+      increaseCurrentMinutes
+      increaseAlarmHours
+      increaseAlarmMinutes
+      increaseTime
+      enableAlarm
+      disableAlarm
+      checkTime
+      start
+    effects
+      startRing
+      stopRing
+    conditions
+      isEqualTime
+    variables
+      currentHour : Integer
+      currentMinute : Integer
+      alarmHour : Integer
+      alarmMinute : Integer
+    states
+      Idle -> start / currentHour:=0; currentMinute:=0; alarmHour:=1; alarmMinute:=1 -> Normal
+      Normal -> increaseCurrentHours / currentHour := 1; checkTime -> Normal
+      Normal -> increaseCurrentMinutes / currentMinute := 1; checkTime -> Normal
+      Normal -> increaseAlarmHours / alarmHour := 1; checkTime -> Normal
+      Normal -> increaseAlarmMinutes / alarmMinute := 1; checkTime -> Normal
+      Normal -> increaseTime / currentMinute := 1; checkTime -> Normal
+      Normal -> enableAlarm / startRing -> Ringing
+      Normal -> checkTime [isEqualTime] / startRing -> Ringing [else] / startRing  -> Normal
+      Ringing -> disableAlarm / stopRing -> Idle
+  scheme
+        objects
+            a = new A(Idle)
+            c = new Clock(Idle)
+        links
+            a.incCurrentHours  <- c.increaseCurrentHours
+            a.incCurrentMins   <- c.increaseCurrentMinutes
+            a.incAlarmHours    <- c.increaseAlarmHours
+            a.incAlarmMins     <- c.increaseAlarmMinutes
+            a.incTime          <- c.increaseTime
+            a.activateAlarm    <- c.enableAlarm
+            a.deactivateAlarm  <- c.disableAlarm
+            c.checkTime <- c.checkTime
+        public
+            a.pressH
+            a.pressM
+            a.pressA
+            a.minuteTimer
+            a.timeBelow
+            a.timeMatch
+            c.start
+        private
+            c.startRing
+            c.stopRing
+.

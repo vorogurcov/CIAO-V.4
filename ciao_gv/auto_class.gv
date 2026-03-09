@@ -1,0 +1,35 @@
+digraph AUTO_CLASS {
+    start [label=AUTO_CLASS shape=plaintext]
+    A [label="class" shape=oval]
+    B [label=name shape=diamond]
+    C [label=EVENTS shape=box]
+    D [label=EFFECTS shape=box]
+    E [label=CONDITIONS shape=box]
+    F [label=ASSERTIONS shape=box]
+    G [label=VARIABLES shape=box]
+    H [label=STATES shape=box]
+    end [label="" shape=point]
+    start -> A
+    A -> B
+    B -> C
+    C -> D
+    C -> E
+    C -> F
+    C -> G
+    C -> H
+
+    D -> E
+    D -> F
+    D-> G
+    D -> H
+
+    E -> F
+    E -> G
+    E -> H
+
+    F-> G
+    F -> H
+    
+    G -> H
+    H -> end
+}

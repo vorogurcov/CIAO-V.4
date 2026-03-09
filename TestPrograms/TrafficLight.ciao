@@ -1,0 +1,28 @@
+ciao TrafficLightProg
+    class TrafficLight
+        events
+            switch
+            stop
+            run
+            toInit
+        effects
+            to_stop
+        variables
+            t1: Integer
+            t2: Integer
+        states
+            Idle -> switch / t1:=20; t2:=10-> Red
+            Red -> after (t1) -> Green
+            Red -> stop / to_stop -> Stop
+            Green -> after (t2) -> Red
+            Green -> stop / to_stop -> Stop
+            Stop->toInit->Idle
+    scheme
+        objects
+            traffic_light = new TrafficLight (Idle)
+        links
+            traffic_light.to_stop<- traffic_light.toInit
+        public
+            traffic_light.switch
+            traffic_light.stop
+.

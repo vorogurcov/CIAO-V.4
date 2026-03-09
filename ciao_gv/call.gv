@@ -1,0 +1,22 @@
+digraph CALL {
+    start [label=CALL shape=plaintext]
+    A [label=name shape=diamond]
+    B [label="(" shape=oval]
+    C [label=EXPRESSION shape=box]
+    D [label="," shape=oval]
+    E [label=")" shape=oval]
+    F [label=":=" shape=oval]
+    G [label=EXPRESSION shape=box]
+    end [label="" shape=point]
+    start -> A
+    A -> B
+    B -> C
+    C -> D
+    D -> C
+    C -> E
+    A -> F
+    F -> G
+    E -> end
+    G -> end
+    A -> end
+}

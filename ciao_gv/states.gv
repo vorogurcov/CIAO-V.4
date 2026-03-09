@@ -1,0 +1,10 @@
+digraph STATES {
+    start [label=STATES shape=plaintext]
+    A [label="states" shape=oval]
+    B [label=STATE shape=box]
+    end [label="" shape=point]
+    start -> A
+    A -> B
+    B -> B
+    B -> end
+}

@@ -1,0 +1,26 @@
+ciao Example
+    class Automate
+        events
+            start
+            step1
+            step2
+            stop
+        effects
+            to_step1
+            to_step2
+            to_exit
+        states
+            Idle -> start / to_step1 -> Step
+            Step -> step1 / to_step2 -> Step
+            Step -> step2 / to_exit -> Exit
+            Exit -> stop -> Idle
+    scheme
+        objects
+            automate = new Automate(Idle)
+        links
+            automate.to_step1 <- automate.step1
+            automate.to_step2 <- automate.step2
+            automate.to_exit <- automate.stop
+        public
+            automate.start
+.

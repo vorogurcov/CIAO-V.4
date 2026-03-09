@@ -1,0 +1,10 @@
+digraph EFFECTS {
+    start [label=EFFECTS shape=plaintext]
+    A [label="effects" shape=oval]
+    B [label=INTERFACE shape=box]
+    end [label="" shape=point]
+    start -> A
+    A -> B
+    B -> B
+    B -> end
+}

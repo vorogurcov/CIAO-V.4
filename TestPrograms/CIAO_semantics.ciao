@@ -1,0 +1,138 @@
+ciao CIAOSemantics
+    class Automaton
+        events
+            create
+            destroy
+            transition
+        effects
+            createState
+            destroyState
+            createTransition
+            destroyTransition
+        variables
+            statesList : State
+            transitions : Transition
+            currentState : State
+        states
+            Initial -> create / createState -> Created
+            Created -> destroy / destroyState -> Destroyed
+            Created -> transition [hasTransition] / createTransition -> Transitioned
+                [else] / destroyTransition -> Created
+            Transitioned -> transition [hasTransition] / createTransition -> Transitioned
+                [else] / destroyTransition -> Created
+
+    class State
+        events
+            enter
+            exit
+        effects
+            onEnter
+            onExit
+        variables
+            name : String
+            transitions : Transition
+        states
+            Inactive -> enter / onEnter -> Active
+            Active -> exit / onExit -> Inactive
+
+    class Transition
+        events
+            trigger
+        effects
+            onTrigger
+        variables
+            source : State
+            target : State
+            guard : Expr
+            effect : Effect
+        states
+            Inactive -> trigger [guard] / onTrigger -> Active
+                [else] / onTrigger -> Inactive
+
+    class Interface
+        events
+            call
+            loop
+        effects
+            onCall
+            onLoop
+        variables
+            name : String
+            vars : Var
+            sorts : Sort
+            link : Link
+        states
+            Idle -> call / onCall -> Called
+            Called -> loop / onLoop -> Looping
+            Looping -> call / onCall -> Called
+
+    class Var
+        events
+            assign
+        effects
+            onAssign
+        variables
+            name : String
+            value : Expr
+        states
+            Unassigned -> assign / onAssign -> Assigned
+
+    class Sort
+        events
+            define
+        effects
+            onDefine
+        variables
+            name : String
+            iSort : ISort
+        states
+            Undefined -> define / onDefine -> Defined
+
+    class Link
+        events
+            connect
+            disconnect
+        effects
+            onConnect
+            onDisconnect
+        variables
+            required : Interface
+            provided : Interface
+        states
+            Disconnected -> connect / onConnect -> Connected
+            Connected -> disconnect / onDisconnect -> Disconnected
+
+    scheme
+        objects
+            automaton = new Automaton (Initial)
+            state = new State (Inactive)
+            transition = new Transition (Inactive)
+            interface = new Interface (Idle)
+            var = new Var (Unassigned)
+            sort = new Sort (Undefined)
+            link = new Link (Disconnected)
+        links
+            automaton.createState <- state.enter
+            automaton.destroyState <- state.exit
+            automaton.createTransition <- transition.trigger
+            automaton.destroyTransition <- transition.trigger
+            interface.call <- transition.trigger
+            interface.loop <- transition.trigger
+            var.assign <- transition.trigger
+            sort.define <- transition.trigger
+            link.connect <- transition.trigger
+            link.disconnect <- transition.trigger
+        public
+            automaton.create
+            automaton.destroy
+            automaton.transition
+            state.enter
+            state.exit
+            transition.trigger
+            interface.call
+            interface.loop
+            var.assign
+            sort.define
+            link.connect
+            link.disconnect
+.

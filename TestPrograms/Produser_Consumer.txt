@@ -1,0 +1,64 @@
+ciao Sample2
+	class Producer	
+		events
+			order (s : Specs)
+			done (g : Goods)
+			reclaim (g : Goods)
+		effects	
+			produce (s : Specs)
+			deliver (g : Goods)
+			refuse (s : Specs)
+		conditions
+			aceptable (s : Specs)
+			success (g : Goods)
+		variables
+			s : Specs
+			g : Goods
+		states
+			ready -> order(s) [acceptable(s)] / produce(s) -> busy 
+				[else] / refuse(s) -> error
+			ready -> reclaim(g) -> error
+			busy -> done(g) [success(g)] / deliver(g) -> ready
+				[else] / refuse(s) -> error
+	class Consumer
+		events
+			need (s : Specs)
+			deliver (g : Goods)
+			refuse (s : Specs)
+		effects
+			order (s : Specs)
+			consume (g : Goods)
+			reclaim (g : Goods)
+		conditions
+			allowed (s : Specs)
+			valid (g : Goods)
+		variables
+			s : Specs
+			g : Goods
+		states
+			normal -> need(s) [allowed(s)] / order(s) -> waiting
+				[else] / reclaim(g) -> error
+			waiting -> deliver(g) [valid(g)] / consume(g) -> normal 
+				[else] / reclaim(g) -> error
+			waiting -> refuse(s) -> error
+	scheme
+		objects
+			p = new Producer (ready)
+			q = new Consumer (normal)
+		links 
+			q <- p.order(s : Specs)
+			q <- p.reclaim(s : Specs)
+			p <- q.deliver(g : Goods)
+			p <- q.refuse(g : Goods)
+		public
+			q.need(s : Specs)
+		private 
+			q.consume(g : Goods)
+			q.allowed(s : Specs)
+			q.valid(g : Goods)
+			p.done(g : Goods)
+			p.produce(s : Specs)
+			p.acceptable(s : Specs)
+			p.success(g : Goods)
+.
+

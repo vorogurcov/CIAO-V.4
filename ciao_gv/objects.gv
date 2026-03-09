@@ -1,0 +1,10 @@
+digraph OBJECTS {
+    start [label=OBJECTS shape=plaintext]
+    A [label="objects" shape=oval]
+    B [label=OBJECT shape=box]
+    end [label="" shape=point]
+    start -> A
+    A -> B
+    B -> B
+    B -> end
+}

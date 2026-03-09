@@ -1,0 +1,10 @@
+digraph STATE {
+    start [label=STATE shape=plaintext]
+    A [label=name shape=diamond]
+    B [label=TRANSITION shape=box]
+    end [label="" shape=point]
+    start -> A
+    A -> B
+    B -> B
+    B -> end
+}

@@ -1,0 +1,388 @@
+ciao CiaoInterpreter
+    class Terminal
+        events
+            set_value (value : String)
+        effects
+            get_value
+        variables
+            value : String
+        states
+            Typed -> set_value (value) / get_value -> Ready  // инициализирован
+
+    class Token
+        events
+            set_type (type : TokenType)
+            set_terminal (terminal : Terminal)
+            set_str (str : String)
+            set_attribute (attribute : Any)
+        effects
+            get_type
+            get_terminal
+            get_str
+            get_attribute
+        variables
+            type : TokenType
+            terminal : Terminal
+            str : String
+            attribute : Any
+        states
+            Empty -> set_type (type) / get_type -> Typed
+            Typed -> set_terminal (terminal) / get_terminal -> TerminalSet
+            TerminalSet -> set_str (str) / get_str -> StringSet
+            StringSet -> set_attribute (attribute) / get_attribute -> Ready
+
+    class TreeNode  // описание структуры TreeNodeType
+        events
+            set_type (type : TreeNodeType)
+            set_attribute (attribute : Any)
+            set_nonterminal (nonterminal : String)
+            set_token (token : Token)
+            add_child (child : TreeNode)
+        effects
+            get_type
+            get_attribute
+            get_nonterminal
+            get_token
+            get_children
+        variables
+            type : TreeNodeType
+            attribute : Any
+            nonterminalType : String
+            token : Token
+            children : List[TreeNode]
+        conditions
+            isChild
+        states
+            Idle -> set_type (type) / get_type -> Typed
+            Typed -> set_attribute (attribute) / get_attribute -> Attributed
+            Attributed -> set_nonterminal (nonterminal) / get_nonterminal -> NonterminalSet
+            NonterminalSet -> set_token (token) / get_token -> TokenSet
+            TokenSet -> add_child (child) / get_children -> WithChildren
+            WithChildren -> add_child (child) [isChild] / get_children -> WithChildren [else] -> Idle
+
+    class Lexer
+        events
+            init_scan (source : String)
+            reinit_scan (source : String)
+            skip_spaces (pos : Integer)
+            get_token (code : String, pos : Integer)
+            process_token (token : Token)
+            afterscan (tokens : List[Token])
+            build_terminal_map
+            handle_error (error : String)
+            finalize_processing
+            prepare_next_scan
+            trigger_skip_ws
+            trigger_building_complete
+
+            kw_conversion (token : Token)
+        effects
+            advance_position
+            add_token
+            convert_to_keyword
+            mark_token_attribute
+            complete_processing
+            clear_lexer_data
+            prepare_terminal_map
+            trigger_main_scan
+            trigger_final_processing
+            prepare_skip_ws
+            complete_building_map
+
+            trigger_kw_conversion
+            trigger_between_token
+            trigger_skip_init
+            trigger_handle_error
+        conditions
+            has_more_input
+            token_valid
+            is_whitespace_char
+            is_potential_keyword
+            is_reserved_word
+            is_terminal_type
+        variables
+            input_source : String
+            current_pos : Integer
+            token_list : List[Token]
+            terminal_mapping : Map[Terminal, List[String]]
+            current_token : Token
+            keywords_info : List[(String, Terminal)]
+        states
+            // Инициализация
+            Idle -> init_scan (input_source) / prepare_terminal_map -> BuildingMap
+
+            // Построение отображения терминалов
+            BuildingMap -> build_terminal_map [has_more_keys] / advance_position; prepare_terminal_map -> BuildingMap
+                         [else] / complete_building_map -> SkipInitialWS
+
+            // Пропуск начальных пробелов
+            SkipInitialWS -> skip_spaces (current_pos) [has_more_input] / advance_position; trigger_skip_init -> SkipInitialWS
+                            [else] / trigger_main_scan -> MainScan
+
+            // Основной цикл сканирования
+            MainScan -> get_token (input_source, current_pos) [token_valid] / add_token -> TokenProcessing
+                       [else] / trigger_handle_error -> ErrorHandling
+
+            // Обработка токена
+            TokenProcessing -> process_token (current_token) [is_terminal_type] / trigger_kw_conversion -> KeywordConversion
+                              [else] / prepare_next_scan -> BetweenTokens
+
+            // Преобразование в ключевые слова
+            KeywordConversion -> kw_conversion (current_token) [is_potential_keyword] / convert_to_keyword; mark_token_attribute; trigger_between_token -> BetweenTokens
+                               [else] / prepare_next_scan; trigger_between_token -> BetweenTokens
+
+            // Пропуск пробелов между токенами
+            BetweenTokens -> skip_spaces (current_pos) [has_more_input] / advance_position; trigger_main_scan -> MainScan
+                            [else] / trigger_final_processing -> FinalProcessing
+
+            // Финальная обработка
+            FinalProcessing -> afterscan (token_list) / complete_processing -> Idle
+
+            // Обработка ошибок
+            ErrorHandling -> handle_error (error) / clear_lexer_data -> Recovery
+            Recovery -> reinit_scan (input_source) -> Idle
+
+    class Parser   // описать GrammarNode
+        events
+            start_parsing (grammar : Map[Nonterminal, GrammarNode], axiom : Nonterminal, tokens : List[Token])
+            process_current_token (token : Token)
+            evaluate_grammar_node
+            check_completion_condition
+            handle_recursive_result (success : Boolean)
+            complete_ast_construction
+            reset_parser_state
+            report_error (message : String)
+            process_semantic_action (code : String)
+
+            evaluate_terminal
+            evaluate_nonterminal
+            evaluate_initial
+        effects
+            initialize_ast
+            add_node_to_ast
+            store_semantic_code
+            move_to_next_token
+            mark_completion_node
+            save_parsing_context
+            restore_parsing_context
+            signal_parsing_error
+            clear_parser_data
+            cache_subtree
+            finalize_parsing_process
+            prepare_for_node_processing
+
+            trigger_terminal
+            trigger_nonterminal
+            trigger_initial
+            trigger_process_current_token
+            trigger_handle
+        conditions
+            reached_end_node
+            is_keyword_type
+            is_terminal_type
+            is_nonterminal_type
+            tokens_remain
+            recursion_completed_successfully
+            no_active_contexts
+            node_handled_successfully
+            is_initial_node
+            trigger_main_processing
+            is_end_recursion
+        variables
+            syntax_rules : Map[Nonterminal, GrammarNode]
+            current_rule : Nonterminal
+            token_stream : List[Token]
+            current_token_index : Integer
+            syntax_tree : TreeNode
+            ast_components : List[TreeNode]
+            semantic_actions : List[String]
+            completion_marker : GrammarNode
+            parsing_contexts : List[ParserContext]
+            active_grammar_node : GrammarNode
+            current_token : Token
+            error_message : String
+            action_code : String
+        states
+            // Инициализация
+            Idle -> start_parsing (syntax_rules, current_rule, token_stream) / initialize_ast; save_parsing_context; trigger_main_processing -> MainProcessing
+
+            // Основной цикл
+            MainProcessing -> check_completion_condition [reached_end_node] /  mark_completion_node -> CompletionPhase
+                             [else] / trigger_process_current_token -> MainProcessing
+            MainProcessing -> process_current_token (current_token) [tokens_remain] / prepare_for_node_processing -> NodeEvaluation
+                             [else] / signal_parsing_error -> ErrorRecovery
+
+            // Обработка узлов
+            NodeEvaluation -> evaluate_grammar_node [is_keyword_type] / add_node_to_ast; store_semantic_code; move_to_next_token -> ActionProcessing
+                             [else] / trigger_terminal -> NodeEvaluation
+            NodeEvaluation -> evaluate_terminal [is_terminal_type] / add_node_to_ast; store_semantic_code; move_to_next_token -> ActionProcessing
+                             [else] / trigger_nonterminal -> NodeEvaluation
+            NodeEvaluation -> evaluate_nonterminal [is_nonterminal_type] / save_parsing_context; start_parsing -> RecursiveDescent
+                             [else] / trigger_initial -> NodeEvaluation
+            NodeEvaluation -> evaluate_initial [is_initial_node] / prepare_for_node_processing; trigger_main_processing -> MainProcessing
+                             [else] / signal_parsing_error -> ErrorRecovery
+
+            // Обработка семантических действий
+            ActionProcessing -> process_semantic_action (action_code) / store_semantic_code; trigger_main_processing -> MainProcessing
+
+            // Рекурсивный спуск
+            RecursiveDescent -> start_parsing (syntax_rules, active_grammar_node, token_stream) [current_token="END"] / trigger_handle -> RecursiveDescent
+                              [else] / save_parsing_context; trigger_main_processing -> MainProcessing
+            RecursiveDescent -> handle_recursive_result (recursion_completed_successfully) [recursion_completed_successfully] /
+                               restore_parsing_context; cache_subtree; store_semantic_code -> ActionProcessing
+                               [else] / restore_parsing_context; signal_parsing_error -> ErrorRecovery
+
+            // Фаза завершения
+            CompletionPhase -> complete_ast_construction [no_active_contexts] / finalize_parsing_process -> Terminated
+            [else] / restore_parsing_context; mark_completion_node -> CompletionPhase
+
+            // Обработка ошибок
+            ErrorRecovery -> report_error (error_message) / clear_parser_data -> Recovery
+            Recovery -> reset_parser_state -> Idle
+
+            Terminated -> reset_parser_state -> Idle
+
+    class InterpreterCore
+        events
+            load_program (ast : TreeNode)
+            step_execution (command : String)
+            execute_command
+            timer_complete
+            process_interface (interface : String)
+            handle_error (error : String)
+        effects
+            create_environment
+            interpret_node
+            show_help
+            show_interfaces
+            interpret_command
+
+            trigger_ready
+            trigger_running
+            clear_interpret_data
+            trigger_handle_error
+            reset_parser_state
+        conditions
+            is_valid
+        variables
+            error : String
+            ast : TreeNode
+            environment : Environment
+            current_command : String
+        states
+            Idle -> load_program (ast) / create_environment; trigger_ready -> Ready
+            Ready -> step_execution (current_command) / interpret_node; trigger_running -> Running
+            Running -> execute_command [current_command="exit"] / reset_interpreter_state -> Idle
+                    [else] / trigger_running -> Running
+            Running -> execute_command [current_command="help"] / show_help; trigger_ready -> Ready
+                    [else] / trigger_running -> Running
+            Running -> execute_command [current_command="interface"] / show_interfaces; trigger_ready -> Ready
+                    [else] / trigger_running -> Running
+            Running -> execute_command [is_valid] / interpret_command; trigger_ready -> Ready
+                    [else] / trigger_handle_error -> ErrorRecovery
+            Running -> process_interface (interface) / interpret_command; trigger_ready -> Ready
+                    [else] / trigger_running -> Running
+
+            // Обработка ошибок
+            ErrorRecovery -> handle_error (error) / clear_interpret_data -> Recovery
+            Recovery -> reset_parser_state -> Idle
+
+    class Environment
+        events
+            create_object (class_name : String, obj_name : String, init_state : String)
+            set_variable (name : String, value : Any)
+            get_variable (name : String)
+            validate_link (link : String)
+            validate_interface (interface : String)
+        effects
+            object_created
+            variable_updated
+            value_retrieved
+            link_validated
+            interface_validated
+        variables
+            objects : Map[String, ObjectInstance]
+            variables : Map[String, Any]
+        states
+            Empty -> create_object (class_name, obj_name, init_state) / object_created -> WithObjects
+            WithObjects -> set_variable (name, value) / variable_updated -> WithVariables
+            WithVariables -> get_variable (name) / value_retrieved -> WithVariables
+            WithVariables -> validate_link (link) / link_validated -> WithVariables
+            WithVariables -> validate_interface (interface) / interface_validated -> WithVariables
+
+// вот отсюда ещё не проверено
+    class ObjectInstance
+        events
+            receive_event (event : String)
+            state_enter (state : String)
+            check_condition (condition : String)
+            execute_actions (actions : List[String])
+        effects
+            handle_transition
+            update_state
+            evaluate_condition
+            perform_actions
+        variables
+            current_state : String
+            conditions : Map[String, Boolean]
+            variables : Map[String, Any]
+        states
+            Initial -> state_enter (state) / update_state -> Ready
+            Ready -> receive_event (event) / handle_transition -> Processing
+            Processing -> execute_actions (actions) / perform_actions -> Ready
+            Ready -> check_condition (condition) / evaluate_condition -> Ready
+
+    scheme
+        objects
+            core = new InterpreterCore(Idle)
+            env = new Environment(Empty)
+            timer = new TimerManager(Inactive)
+
+        links
+            core.create_environment -> env.create_object
+            core.interpret_command -> env.validate_interface
+            core.start_timer -> timer.start
+            core.cancel_timer -> timer.cancel
+            timer.expire -> core.timer_complete
+            env.interface_validated -> core.process_interface
+
+        public
+            core.load_program
+            core.handle_command
+            core.step_execution
+    .
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,14 @@
+digraph TRANSITION {
+    start [label=TRANSITION shape=plaintext]
+    A [label="->" shape=oval]
+    B [label=CALL shape=box]
+    C [label=DIRECT shape=box]
+    D [label=CHOICE shape=box]
+    end [label="" shape=point]
+    start -> A
+    A -> B
+    B -> C
+    B -> D
+    C -> end
+    D -> end
+}
