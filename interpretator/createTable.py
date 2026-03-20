@@ -150,12 +150,14 @@ def create_link(list_words):
 
 def parse_links(list_words):
     i = list_words.index('<-')
-    # dict_source = create_dict(list_words[:i])
-    # dict_target = create_dict(list_words[i+1:])
-    # dict_source.update(dict_target)
     source = "".join(list_words[:i])
     target = "".join(list_words[i + 1:])
-    return [{source: target}]
+    return [{
+        "source": source,
+        "targets": [target],
+        "policy": "all",
+        "filter": None
+    }]
 
 
 def parse_public(child, str_command, curr_dict):

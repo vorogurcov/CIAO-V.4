@@ -175,20 +175,56 @@ class Interpreter:
         return False
 
     def initLink(self):
-        self.links = self.table_code["scheme"]["links"]
+        self.links = self.normalize_links(self.table_code["scheme"]["links"])
         print()
         for link in self.links:
-            for key, value in link.items():
-                if not self.validationLink(key):
-                    print(Fore.RED + f"в связи {key} <- {value}")
+            source = link["source"]
+            targets = link["targets"]
+            if not self.validationLink(source):
+                print(Fore.RED + f"в связи {source} <- {targets}")
+                self.links = None
+                return
+            for target in targets:
+                if not self.validationLink(target):
+                    print(Fore.RED + f"в связи {source} <- {target}")
                     self.links = None
                     return
-                if not self.validationLink(value):
-                    print(Fore.RED + f"в связи {key} <- {value}")
-                    self.links = None
-                    return
-                print("Установлена связь " + Style.BRIGHT + f"{key} <- {value}")
+            print("Установлена связь " + Style.BRIGHT + f"{source} <- {', '.join(targets)}")
         print()
+
+    def normalize_links(self, links):
+        normalized = {}
+        for link in links:
+            if "source" in link:
+                source = link["source"]
+                targets = link.get("targets", [])
+                policy = link.get("policy", "all")
+                filter_value = link.get("filter")
+            else:
+                source, target = next(iter(link.items()))
+                targets = [target]
+                policy = "all"
+                filter_value = None
+
+            if source not in normalized:
+                normalized[source] = {
+                    "source": source,
+                    "targets": [],
+                    "policy": policy,
+                    "filter": filter_value
+                }
+
+            for target in targets:
+                if target not in normalized[source]["targets"]:
+                    normalized[source]["targets"].append(target)
+
+        return list(normalized.values())
+
+    def get_link_targets(self, source):
+        for link in self.links:
+            if link["source"] == source:
+                return link["targets"], link.get("policy", "all")
+        return [], "all"
 
     def initInterface(self):
         if "public" in self.table_code["scheme"]:
@@ -360,22 +396,17 @@ class Interpreter:
 
     def interpretCondition(self, obj, condition):
         link_conditions = f"{obj}.{condition}"
-        obj_assert = None
-        assertion = None
-        for link in self.links:
-            for key, value in link.items():
-                if link_conditions not in key:
-                    continue
-                event_link = value
-                parts = event_link.split('.')
-                print(f"{Style.BRIGHT + obj + Style.RESET_ALL} >> "
-                      f"Вычисление утверждения {Style.BRIGHT + parts[1] + Style.RESET_ALL} "
-                      f"у объекта {Style.BRIGHT + parts[0] + Style.RESET_ALL} \n")
-                obj_assert = parts[0]
-                assertion = parts[1]
-                break
-        if not assertion:
+        targets, _ = self.get_link_targets(link_conditions)
+        if not targets:
             return not self.objects[obj].condition[condition]
+
+        event_link = targets[0]
+        parts = event_link.split('.')
+        print(f"{Style.BRIGHT + obj + Style.RESET_ALL} >> "
+              f"Вычисление утверждения {Style.BRIGHT + parts[1] + Style.RESET_ALL} "
+              f"у объекта {Style.BRIGHT + parts[0] + Style.RESET_ALL} \n")
+        obj_assert = parts[0]
+        assertion = parts[1]
 
         assert_ = self.objects[obj_assert].assertion[assertion]
         # нужно будет добавить проверку и других утверждений
@@ -408,17 +439,16 @@ class Interpreter:
                 continue
 
             link_act = f"{obj}.{act}"
-            for link in self.links:
-                for key, value in link.items():
-                    if link_act not in key:
-                        continue
-                    event_link = value
-                    parts = event_link.split('.')
-                    print(f"{Style.BRIGHT + obj + Style.RESET_ALL} >> "
-                          f"Событие {Style.BRIGHT + parts[1] + Style.RESET_ALL} "
-                          f"отправлено объекту {Style.BRIGHT + parts[0] + Style.RESET_ALL}\n")
-                    self.interpret(event_link, False)
-                    break
+            targets, policy = self.get_link_targets(link_act)
+            if policy == "first" and targets:
+                targets = [targets[0]]
+
+            for event_link in targets:
+                parts = event_link.split('.')
+                print(f"{Style.BRIGHT + obj + Style.RESET_ALL} >> "
+                      f"Событие {Style.BRIGHT + parts[1] + Style.RESET_ALL} "
+                      f"отправлено объекту {Style.BRIGHT + parts[0] + Style.RESET_ALL}\n")
+                self.interpret(event_link, False)
 
             print(f"{Style.BRIGHT + obj + Style.RESET_ALL} >> Действие: {Style.BRIGHT + act + Style.RESET_ALL} "
                   f"- выполнено")
