@@ -152,12 +152,9 @@ def parse_links(list_words):
     i = list_words.index('<-')
     source = "".join(list_words[:i])
     target = "".join(list_words[i + 1:])
-    return [{
-        "source": source,
-        "targets": [target],
-        "policy": "all",
-        "filter": None
-    }]
+    # Внешняя форма `scheme.links` остаётся бинарной:
+    # одна запись = один target для одного source.
+    return [{source: target}]
 
 
 def parse_public(child, str_command, curr_dict):

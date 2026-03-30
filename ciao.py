@@ -1,38 +1,46 @@
-import graphviz
-from copy import deepcopy
-from build_ast import GetAST
-from R_ast import GenerateCode
+"""
+Точка входа: построение AST по грамматике CIAO (цепочка, согласованная с материалом статьи:
+лексика → постобработка токенов → синтаксис → AST).
+
+Интерпретатор с очередью событий (Dispatcher / Queue / Handler / Storage) в этом репозитории
+не входит в костяк — см. каталог `legacy/`.
+"""
+import os
 import sys
-from interpretator.interpreter import InterpretCode
+
+from build_ast import GetAST
 
 
-def handle_command(command):
-    if command == "":
-        return True
-    if command == "exit":
-        print("Завершение программы.")
-        return False
-    elif command == "help":
-        print("Доступные команды:")
-        print("  help - показать список команд")
-        print("  exit - завершить программу")
-    # elif command == "re-translate":
-    #     ast = GetAST(ciao_json_file, command, False)
-        # print(GenerateCode(ast, "_debug\\out.ciao")
-    else:
-        ast = GetAST(ciao_json_file, command, False)
-        # print(GenerateCode(ast, "_debug\\out.ciao")
+def _repo_root() -> str:
+    return os.path.dirname(os.path.abspath(__file__))
+
+
+def main() -> None:
+    ciao_json = os.path.join(_repo_root(), "ciao.json")
+    print("CIAO — построение AST (костяк по статье).\n")
+    print("Команды: help — справка, exit — выход.\n")
+    print("К старому интерпретатору/компилятору: см. legacy/README.md\n\n")
+    while True:
+        command = input("> ").strip()
+        command = command.replace(">", "")
+        if command == "":
+            continue
+        if command == "exit":
+            print("Завершение.")
+            break
+        if command == "help":
+            print("  Введите путь к файлу .ciao — будет построен AST.")
+            print("  При задании debugInfoDir в ciao.json — SVG в каталог отладки.")
+            print("  exit — выход.")
+            continue
+        ast = GetAST(ciao_json, command, False)
         if ast:
-            InterpretCode(ast)
-    return True
+            print("OK: AST построен успешно.\n")
 
 
 if __name__ == "__main__":
-    ciao_json_file = 'ciao.json'
-    print("Начало работы программы...")
-    while True:
-        print("\nВведите путь к файлу с кодом или команду")
-        command = input("> ").strip()
-        command = command.replace(">", "")
-        if not handle_command(command):
-            break
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("\nПрервано.")
+        sys.exit(0)

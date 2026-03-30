@@ -41,7 +41,11 @@ def __RenderAst(diagramName, ast, debugInfoDir, view):
         i += 1
 
     # Рендерим граф в файл
-    output_path = h.render(directory=debugInfoDir, view=False)  # Не открываем файл сразу
+    try:
+        output_path = h.render(directory=debugInfoDir, view=False)  # Не открываем файл сразу
+    except (OSError, PermissionError) as e:
+        print("AST построено, но не удалось сохранить SVG:", e)
+        return
     print("AST построено")
     print("Путь до файла с AST: ", output_path)
     # Открываем файл, если параметр view=True
